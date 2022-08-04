@@ -1,45 +1,60 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const validator = require('validator');
 const user = require('../models/user');
 const createToken = require('../config/createToken');
 const sendEmail = require('../config/sendEmail');
-const gridOfRandomImages = require('../config/gridOfRandomImages')
-
-
+const gridOfRandomImages = require('../config/gridOfRandomImages');
 
 router.get('/signup', (req, res)=>{
+    const noBucket = createToken({key: process.env.NO_BUCKET}, process.env.BUCKET_SECRET_KEY, '300s')
+    const bucketA = createToken({key: process.env.BUCKET_A}, process.env.BUCKET_SECRET_KEY, '300s')
+    const bucketB = createToken({key: process.env.BUCKET_B}, process.env.BUCKET_SECRET_KEY, '300s')
+    const bucketC = createToken({key: process.env.BUCKET_C}, process.env.BUCKET_SECRET_KEY, '300s')
+    res.render('register',{
+        gridOfRandomImages:gridOfRandomImages(),
+        noBucket,
+        bucketA,
+        bucketB,
+        bucketC
 
-    res.render('register',{gridOfRandomImages:gridOfRandomImages()})
+    })
 })
 
 
 // Api for Signup
 router.post('/signup', async (req, res) => {
 
-
+    const {name, email, password} = req.body;
+    console.log(password);
     
-    let email = await user.findOne({ email: req.body.email });
+    let foundEmail = await user.findOne({ email: email });
 
     // Check if user already exists
-    if (email) {
+    if (foundEmail) {
         return res.status(400).send(' User already exists!');
-    } else {
-            //  Here we validate the user email 
-            if (validator.isEmail(req.body.email)) {
-                const userData = new user({
-                    name: req.body.name,
-                    email:req.body.email,
-                    password: req.body.password
-                });
-                // Store data Into Database
-                await userData.save();
-                res.send(userData);
-            } else {
-                res.status(400).send('Invalid Credentials');
-            }
-
+    } 
+    //  Here we validate the user email 
+    if (!validator.isEmail(email) || !name) {
+        return res.status(400).send('Invalid Credentials');
     }
+    // Validating length of the password
+    if(!(password.split(',').length >= 4)){
+        return res.status(400).send('Select atleast 4 images');
+    }
+    // return res.send(req.body)
+        const userData = new user({
+            name,
+            email,
+            password
+        });
+        // Store data Into Database
+        await userData.save();
+        res.send(userData);
+    
+
+    
 })
 
 // Api for Login

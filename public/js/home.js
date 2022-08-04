@@ -1,16 +1,45 @@
+
 const gpwd_set = new Set()
-function onSelect(res) {
-   
-    if (gpwd_set.has(res)) {
-        console.log('true');
-        gpwd_set.delete(res);
-        document.getElementById(res).style.border = null;
-    } else {
+const passArray = [];
+
+// const noBucket = new Set()
+// const bucketA = new Set()
+// const bucketB = new Set()
+// const bucketC = new Set()
+
+
+
+// let selectedBucket = document.getElementById();
+function onSelectImage(res) {
+    let selectedBucket = document.querySelector('input[name="radios"]:checked').value;
+    console.log(selectedBucket);
+
+    if(gpwd_set.has(res)){
+        if(res == passArray[passArray.length-1].split('_')[0]){
+            passArray.pop();
+            gpwd_set.delete(res);
+            document.getElementById(res).style.border = null;
+        }else{
+            console.log("Delete last element in order first!")
+        }
+    }else{
+        passArray.push(`${res}_${selectedBucket}`)
         gpwd_set.add(res);
         document.getElementById(res).style.border = "4px solid orange";
         document.getElementById(res).style.borderRadius = '100%';
-        console.log(gpwd_set)
+        console.log(passArray)
     }
+   
+    // if (gpwd_set.has(res)) {
+    //     console.log('true');
+    //     gpwd_set.delete(res);
+    //     document.getElementById(res).style.border = null;
+    // } else {
+    //     gpwd_set.add(res);
+    //     document.getElementById(res).style.border = "4px solid orange";
+    //     document.getElementById(res).style.borderRadius = '100%';
+    //     console.log(gpwd_set)
+    // }
 }
 
 function post(path, params, method = 'post') {
@@ -44,6 +73,6 @@ form.addEventListener('submit', function (event) {
     post('', {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        password: Array.from(gpwd_set),
+        password: passArray
     })
 });
