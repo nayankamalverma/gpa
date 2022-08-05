@@ -15,7 +15,7 @@ function onSelectImage(res) {
     console.log(selectedBucket);
 
     if(gpwd_set.has(res)){
-        if(res == passArray[passArray.length-1].split('_')[0]){
+        if(res == passArray[passArray.length-1].split(':_:')[0]){
             passArray.pop();
             gpwd_set.delete(res);
             document.getElementById(res).style.border = null;
@@ -23,7 +23,7 @@ function onSelectImage(res) {
             console.log("Delete last element in order first!")
         }
     }else{
-        passArray.push(`${res}_${selectedBucket}`)
+        passArray.push(`${res}:_:${selectedBucket}`)
         gpwd_set.add(res);
         document.getElementById(res).style.border = "4px solid orange";
         document.getElementById(res).style.borderRadius = '100%';

@@ -6,6 +6,7 @@ const user = require('../models/user');
 const createToken = require('../config/createToken');
 const sendEmail = require('../config/sendEmail');
 const gridOfRandomImages = require('../config/gridOfRandomImages');
+const verifyPasswordToken = require('../middleware/verifyPasswordToken');
 
 router.get('/signup', (req, res)=>{
     const noBucket = createToken({key: process.env.NO_BUCKET}, process.env.BUCKET_SECRET_KEY, '300s')
@@ -24,10 +25,10 @@ router.get('/signup', (req, res)=>{
 
 
 // Api for Signup
-router.post('/signup', async (req, res) => {
+router.post('/signup', verifyPasswordToken, async (req, res) => {
 
     const {name, email, password} = req.body;
-    console.log(password);
+    // return res.send(password)
     
     let foundEmail = await user.findOne({ email: email });
 
@@ -40,14 +41,15 @@ router.post('/signup', async (req, res) => {
         return res.status(400).send('Invalid Credentials');
     }
     // Validating length of the password
-    if(!(password.split(',').length >= 4)){
+    if(!(password.length >= 4)){
         return res.status(400).send('Select atleast 4 images');
     }
+    res.send(password.toString())
     // return res.send(req.body)
         const userData = new user({
             name,
             email,
-            password
+            password: password.toString()
         });
         // Store data Into Database
         await userData.save();
@@ -58,13 +60,16 @@ router.post('/signup', async (req, res) => {
 })
 
 // Api for Login
-router.post('/login', async (req, res) => {
+router.post('/login', verifyPasswordToken, async (req, res) => {
 
 
     //  Get value from user 
-        const email = req.body.email;
-        const password = req.body.password;
-    
+        const {email, password} = req.body;
+        
+        const foundUser = await user.findOne({ email: email });
+        if(!foundUser){
+            res.send("you've not been registered yet")
+        }
     
         user.findOne({ email: email }, function (error, foundUser) {
             if (!error) {
