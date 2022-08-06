@@ -11,8 +11,9 @@ const passArray = [];
 
 // let selectedBucket = document.getElementById();
 function onSelectImage(res) {
+    console.log(res);
     let selectedBucket = document.querySelector('input[name="radios"]:checked').value;
-    console.log(selectedBucket);
+    // console.log(selectedBucket);
 
     if(gpwd_set.has(res)){
         if(res == passArray[passArray.length-1].split(':_:')[0]){
@@ -69,10 +70,20 @@ function post(path, params, method = 'post') {
 var form = document.getElementById('post-form');
 form.addEventListener('submit', function (event) {
     event.preventDefault();
-    console.log("form submitted!");
-    post('', {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        password: passArray
-    })
+    let inputObj;
+    if(!(document.getElementById('email')) && !(document.getElementById('name'))){
+        inputObj = {
+                password: passArray
+            }
+    }else{
+        !(document.getElementById('name')) ? inputObj = {
+            email: document.getElementById('email').value,
+            password: passArray
+        } : inputObj = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            password: passArray
+        }
+    }
+    post('', inputObj)
 });
