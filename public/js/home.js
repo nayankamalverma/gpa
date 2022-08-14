@@ -1,15 +1,12 @@
 const gpwd_set = new Set();
 const passArray = [];
 
-// const noBucket = new Set()
-// const bucketA = new Set()
-// const bucketB = new Set()
-// const bucketC = new Set()
-
 // let selectedBucket = document.getElementById();
 function onSelectImage(res) {
   console.log(res);
-  let selectedBucket = document.querySelector('input[name="radios"]:checked').value;
+  let selectedBucket = document.querySelector(
+    'input[name="radios"]:checked'
+  ).value;
   // console.log(selectedBucket);
 
   if (gpwd_set.has(res)) {
@@ -17,7 +14,7 @@ function onSelectImage(res) {
       passArray.pop();
       gpwd_set.delete(res);
       document.getElementById(res).style.border = null;
-      document.getElementById(`${res}_num`).classList.remove('num');
+      document.getElementById(`${res}_num`).classList.remove("num");
       document.getElementById(`${res}_num`).textContent = "";
     } else {
       console.log("Delete last element in order first!");
@@ -27,7 +24,7 @@ function onSelectImage(res) {
     gpwd_set.add(res);
     document.getElementById(res).style.border = "4px solid orange";
     document.getElementById(res).style.borderRadius = "100%";
-    document.getElementById(`${res}_num`).classList.add('num');
+    document.getElementById(`${res}_num`).classList.add("num");
     document.getElementById(`${res}_num`).textContent = passArray.length;
     console.log(passArray);
   }
