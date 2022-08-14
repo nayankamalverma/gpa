@@ -1,34 +1,124 @@
-.radio-toolbar input[type="radio"] {
-    display: none;
-  }
-  
-  .radio-toolbar label {
-    display: inline-block;
-    background-color: #ddd;
-    padding: 4px 11px;
-    font-family: Arial;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .radio-toolbar input[type="radio"]:checked+label {
-    background-color: #bbb;
-  }
+* {
+  /* border: 1px solid red; */
+}
 
-  .div-btn{
-    height: 25px;
-    width: 25px;
-    border-radius: 100px;
+body {
+  background-color: #f9f5eb;
 }
-#gold{
-    background-color: gold;
+
+.card {
+  background-color: #eae3d2;
+  border-radius: 30px;
+  box-shadow: 4px 7px 20px 1px rgba(0, 0, 0, 0.3);
+  padding: 15px 40px;
 }
-#red{
-    background-color: red;
+
+.form-control {
+  border-radius: 15px;
 }
-#blue{
-    background-color: blue;
+
+.row {
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: space-around;
+  margin: 2px;
 }
-#green{
-    background-color: green;
+
+.visiblock {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.line {
+  height: 2px;
+  width: 35%;
+  align-self: center;
+  background-color: black;
+}
+
+.visibility,
+.visibility1 {
+  height: 40px;
+  width: 40px;
+}
+
+.hidden {
+  display: none;
+}
+
+.mb4 {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.col-2 {
+  padding-left: 0px;
+}
+
+.btn {
+  float: right;
+}
+
+.reset {
+  text-align: right;
+}
+
+.foot {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: space-between;
+}
+
+.num {
+  position: absolute;
+  background-color: rgb(122, 229, 122);
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.radio-toolbar input[type="radio"] {
+  display: none;
+}
+
+.radio-toolbar label {
+  display: inline-block;
+  padding: 4px 11px;
+  font-family: Arial;
+  font-size: 16px;
+  cursor: pointer;
+  width: 50px;
+  text-align: center;
+  border-radius: 30px;
+  background-color: #1c3879;
+  color: white;
+  cursor: grab;
+}
+
+.radio-toolbar input[type="radio"]:checked + label {
+  background-color: #3355a5;
+  font-size: 24px;
+}
+
+.div-btn {
+  height: 25px;
+  width: 25px;
+  border-radius: 100px;
+}
+#gold {
+  background-color: gold;
+}
+#red {
+  background-color: red;
+}
+#blue {
+  background-color: blue;
+}
+#green {
+  background-color: green;
 }

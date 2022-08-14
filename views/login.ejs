@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-
+    
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -14,29 +14,30 @@
     <title>Register page</title>
 </head>
 
-<body>
+<body> 
 
-    <div class="container w-25 mt-5">
+    <div class="container card w-25 mt-5">
 
         <form id="post-form">
 
             <!-- Email input -->
-            <div class="form-outline mb-4">
-                <input type="email" id="email" class="form-control" />
+            <div class="form-outline mb-2">
                 <label class="form-label" for="form1Example1">Email address</label>
+                <input type="email" id="email" class="form-control" />
             </div>
 
             <!-- Images to creat password -->
             <div class="form-group">
                 <label for="password">Password:</label>
-                <br>
-                <br>
+                <br><br>
+
                 
                 <% gridOfRandomImages.forEach(function(row){ %>
                     <div class="row no-gutters">
             
                     <% row.forEach(function(col){ %>
                         <div class="col-2 no-gutters">
+                            <div class="num">1</div>
                             <img src='/img/<%= Object.keys(col)[0] %>.svg' alt="img" style="
                                 height: 50px;
                                 width: 50px;" 
@@ -47,8 +48,16 @@
                 </div>
                 <div style="padding-bottom: 15px;"></div>
                <% }) %>
-               
-              <div class="container mb-4">
+
+               <div class="visiblock">
+                <div class="line"></div>
+                <img src='/img/eyeOpen.png' alt="eye" class="visibility" onClick="onVisibility()">
+                <img src='/img/eyeClosed.png' alt="eye" class="visibility1 hidden" onClick="onVisibility()">
+                <div class="line"></div>
+               </div>
+
+
+              <div class="container mb4 mb-4">
                 <div class="radio-toolbar d-flex">
                     <div hidden>
                         <input type="radio" id="noBucket" name="radios" value="<%= noBucket %>" checked>
@@ -68,10 +77,11 @@
                   </div>
               </div>
               <!-- https://stackoverflow.com/questions/4641752/css-how-to-style-a-selected-radio-buttons-label -->
-
-              <div><small><a href="/api/resetpassword">Reset Password</a></small></div> 
+<div class="foot">
+              <div class="reset"><small><a href="/api/resetpassword">Reset Password</a></small></div> 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary btn-block mt-2">Sign in</button>
+        </div>
         </form>
     </div>
 
