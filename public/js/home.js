@@ -90,7 +90,7 @@ form.addEventListener("submit", function (event) {
 function onVisibility() {
   document.querySelector(".visibility").classList.toggle("hidden");
   document.querySelector(".visibility1").classList.toggle("hidden");
-  document.querySelectorAll(".num").forEach(function (item) {
+  document.querySelectorAll(".hide").forEach(function (item) {
     item.classList.toggle("hidden");
   });
 }

@@ -2,7 +2,24 @@ const jwt = require('jsonwebtoken');
 const verifyToken = require('../config/verifyToken');
 
 const verifyPasswordToken = async (req, res, next) => {
-    let password = req.body.password
+    let {name, email, password, formType} = req.body
+
+    if(!password){
+        req.flash("error", "Select password");
+        req.flash("name", name);
+        req.flash("email", email);
+
+        if(formType == "signup"){
+            return res.redirect('/signup')
+        }
+        if(formType == "login"){
+            return res.redirect('/login')
+        }
+        if(formType == "newPassword"){
+            let token = req.params['token']
+            return res.redirect(`/resetpassword/${token}`)
+        }
+    }
 
     let passArray = password.split(',');
     for (let i = 0; i < passArray.length; i++) {
@@ -13,7 +30,7 @@ const verifyPasswordToken = async (req, res, next) => {
         let decodedBucketToken = verifyToken(bucketToken, process.env.BUCKET_SECRET_KEY)
 
         if(!decodedImageToken || !decodedBucketToken){
-            return res.send("Invalid token, either image token or bucket token")
+            req.send("Invalid token, either image token or bucket token");
         }
         
         passArray[i] = `${decodedImageToken.key}:_:${decodedBucketToken.key}`

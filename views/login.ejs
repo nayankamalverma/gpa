@@ -17,13 +17,18 @@
 <body> 
 
     <div class="container card w-25 mt-5">
-
+        <% if(messages.error) {%> 
+            <small style="color:red"><%= messages.error %> </small>
+        <% } %> 
+        <% if(messages.success) {%> 
+            <small style="color: green;" ><%= messages.success %> </small>
+        <% } %>
         <form id="post-form">
 
             <!-- Email input -->
             <div class="form-outline mb-2">
                 <label class="form-label" for="form1Example1">Email address</label>
-                <input type="email" id="email" class="form-control" />
+                <input type="email" id="email" class="form-control" value="<%= messages.email %>" />
             </div>
 
             <!-- Images to creat password -->
@@ -37,7 +42,7 @@
             
                     <% row.forEach(function(col){ %>
                         <div class="col-2 no-gutters">
-                            <div id="<%= `${col[Object.keys(col)[0]]}_num` %>"></div>
+                            <div id="<%= `${col[Object.keys(col)[0]]}_num` %>" class="hide"></div>
                             <img src='/img/<%= Object.keys(col)[0] %>.svg' alt="img" style="
                                 height: 50px;
                                 width: 50px;" 
@@ -78,7 +83,8 @@
               </div>
               <!-- https://stackoverflow.com/questions/4641752/css-how-to-style-a-selected-radio-buttons-label -->
 <div class="foot">
-              <div class="reset"><small><a href="/api/resetpassword">Reset Password</a></small></div> 
+              <input type="text" name="formType" value="login" hidden>
+              <div class="reset"><small><a href="/resetpassword">Reset Password</a></small></div> 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary btn-block mt-2">Sign in</button>
         </div>

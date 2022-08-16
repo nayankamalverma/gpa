@@ -9,6 +9,11 @@ const gridOfRandomImages = require('../config/gridOfRandomImages');
 const verifyPasswordToken = require('../middleware/verifyPasswordToken');
 const verifyToken = require('../config/verifyToken');
 const bcrypt = require('bcryptjs');
+
+router.get('/',(req,res)=>{
+    res.render('success')
+})
+
 router.get('/signup', async (req, res)=>{
     const noBucket = createToken({key: process.env.NO_BUCKET}, process.env.BUCKET_SECRET_KEY, '300s')
     const bucketA = createToken({key: process.env.BUCKET_A}, process.env.BUCKET_SECRET_KEY, '300s')
@@ -19,7 +24,8 @@ router.get('/signup', async (req, res)=>{
         noBucket,
         bucketA,
         bucketB,
-        bucketC
+        bucketC,
+        error: ""
 
     })
 })
@@ -45,9 +51,7 @@ router.get('/resetpassword', (req, res)=>{
 
 router.get('/resetpassword/:token', async (req, res) => {
     const token = req.params['token'];
-    console.log(token);
     const isValid = verifyToken(token, process.env.RESET_SECRET_KEY)
-    console.log("isValid: ", isValid)
 
     if(!isValid){
         return res.send("Invalid token!")
@@ -77,15 +81,23 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
 
     // Check if user already exists
     if (foundEmail) {
-        return res.status(400).send(' User already exists!');
+        req.flash("error", "User already exist");
+        req.flash("name", name);
+        return res.redirect('/signup')
     } 
     //  Here we validate the user email 
     if (!validator.isEmail(email) || !name) {
-        return res.status(400).send('Invalid Credentials');
+        req.flash("error", "Invalid Credentials");
+        req.flash("name", name);
+        req.flash("email", email);
+        return res.redirect('/signup')
     }
     // Validating length of the password
     if(!(password.length >= 4)){
-        return res.status(400).send('Select atleast 4 images');
+        req.flash("error", "Select atleast 4 images");
+        req.flash("name", name);
+        req.flash("email", email);
+        return res.redirect('/signup')
     }
     // return res.send(req.body)
         const userData = new user({
@@ -95,8 +107,7 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
         });
         // Store data Into Database
         await userData.save();
-        res.send(userData);
-    
+        res.redirect("/")
 
     
 })
@@ -107,28 +118,40 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
 
     //  Get value from user 
         const {email, password} = req.body;
+
+        if(!email){
+            req.flash("error", "Invalid Credentials")
+            req.flash("email", email);
+            return res.redirect('/login')
+        }
         
         const foundUser = await user.findOne({ email: email });
 
         if(!foundUser){
-            return res.send("you've not been registered yet")
+            req.flash("error", "You've not been registered yet")
+            req.flash("email", email);
+            return res.redirect('/login')
         }
 
         const isMatch = await bcrypt.compare(password.toString(), foundUser.password)
         if(!isMatch){
-            return res.send("Incorrect password!")
+            req.flash("error", "Incorrect password!")
+            req.flash("email", email);
+            return res.redirect('/login')
         }
-        return res.send("You are a authorized user")
+        return res.redirect("/")
     })
 
 // Api for Mailing Reset link
 router.post('/sendresetlink', async (req, res) => {
 
-    const foundUser = await user.findOne({email: req.body.email});
-    console.log(foundUser);
+    const email = req.body.email;
+
+    const foundUser = await user.findOne({email: email});
 
     if(!foundUser){
-        return res.send('Does not exist user with this email.');
+        req.flash("error", "Does not exist user with this email!")
+        return res.redirect('/resetpassword')
     }
 
     const payload = {
@@ -142,7 +165,9 @@ router.post('/sendresetlink', async (req, res) => {
     // if(!emailResponse){
     //     return res.send("unable to send email, please try again after sometime!")
     // }
-    res.send("Reset link has been sent to user!")
+    req.flash("success", "Reset link has been sent to user!")
+    req.flash("email", email)
+    return res.redirect('/resetpassword')
 
 
 })
@@ -164,7 +189,8 @@ router.post('/resetpassword/:token', verifyPasswordToken, async (req, res) => {
     foundUser.password = password.toString();
     foundUser.save();
 
-    res.send("Your password has been changed");
+    req.flash("success", "Your password has been changed")
+    return res.redirect('/login')
 
 })
 

@@ -3,7 +3,9 @@ const nodemailer = require('nodemailer');
 function sendEmail(email, token){
 
     var transporter = nodemailer.createTransport({
-        service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
         auth: {
           user: process.env.EMAIL,
           pass: process.env.PASSWORD
@@ -14,7 +16,7 @@ function sendEmail(email, token){
       from: process.env.EMAIL,
       to: email,
       subject: 'Reset Graphical Password',
-      text: 'http://localhost:3000/api/resetpassword/'+ token
+      text: 'http://localhost:3000/resetpassword/'+ token
     };
     
     transporter.sendMail(mailOptions, function(error, info){
