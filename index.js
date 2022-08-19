@@ -4,6 +4,7 @@ const app = express();
 const session = require("express-session");
 const flash = require("express-flash");
 const MongoDbStore = require("connect-mongo");
+const cookieParser = require('cookie-parser');
 require('./db/conn.js');
 
 //session store
@@ -21,7 +22,7 @@ let mongoStore = MongoDbStore.create({
       cookie: { maxAge: 1000 * 60 * 60 * 24 }, //24 hours
     })
   );
-  
+  app.use(cookieParser());
   app.use(flash());
 
 

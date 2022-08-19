@@ -11,7 +11,20 @@ const verifyToken = require('../config/verifyToken');
 const bcrypt = require('bcryptjs');
 
 router.get('/',(req,res)=>{
+    const userCookie = req.cookies['token'];
+    if(!userCookie){
+        return res.redirect('login')
+    }
+    const decoded = verifyPasswordToken(userCookie, process.env.USER_COOKIE_SECRET)
+    if(!decoded){
+        return res.redirect('login');
+    }
     res.render('success')
+})
+
+router.get('/logout',(req,res)=>{
+    res.clearCookie("token");
+    res.redirect('login')
 })
 
 router.get('/signup', async (req, res)=>{
@@ -139,6 +152,13 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
             req.flash("email", email);
             return res.redirect('/login')
         }
+        let userCookie = {
+            _id: foundUser._id,
+            email: foundUser.email
+        }
+        let userToken = createToken(userCookie, process.env.USER_COOKIE_SECRET, '24h')
+        console.log(userCookie);
+        res.cookie('token', userToken, {maxAge: 360000});
         return res.redirect("/")
     })
 

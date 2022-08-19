@@ -13,7 +13,8 @@ function onSelectImage(res) {
     if (res == passArray[passArray.length - 1].split(":_:")[0]) {
       passArray.pop();
       gpwd_set.delete(res);
-      document.getElementById(res).style.border = null;
+      // document.getElementById(res).style.border = null;
+      document.getElementById(res).classList.remove("image-border");
       document.getElementById(`${res}_num`).classList.remove("num");
       document.getElementById(`${res}_num`).textContent = "";
     } else {
@@ -22,8 +23,9 @@ function onSelectImage(res) {
   } else {
     passArray.push(`${res}:_:${selectedBucket}`);
     gpwd_set.add(res);
-    document.getElementById(res).style.border = "4px solid orange";
-    document.getElementById(res).style.borderRadius = "100%";
+    // document.getElementById(res).style.border = "4px solid orange";
+    // document.getElementById(res).style.borderRadius = "100%";
+    document.getElementById(res).classList.add("image-border");
     document.getElementById(`${res}_num`).classList.add("num");
     document.getElementById(`${res}_num`).textContent = passArray.length;
     console.log(passArray);
@@ -92,5 +94,9 @@ function onVisibility() {
   document.querySelector(".visibility1").classList.toggle("hidden");
   document.querySelectorAll(".hide").forEach(function (item) {
     item.classList.toggle("hidden");
+  });
+  
+  document.querySelectorAll(".hide-img").forEach(function (item) {
+    item.classList.toggle("hide-image-border");
   });
 }
