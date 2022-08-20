@@ -15,7 +15,7 @@ router.get('/',(req,res)=>{
     if(!userCookie){
         return res.redirect('login')
     }
-    const decoded = verifyPasswordToken(userCookie, process.env.USER_COOKIE_SECRET)
+    const decoded = verifyToken(userCookie, process.env.USER_COOKIE_SECRET)
     if(!decoded){
         return res.redirect('login');
     }
