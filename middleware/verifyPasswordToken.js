@@ -2,12 +2,10 @@ const jwt = require('jsonwebtoken');
 const verifyToken = require('../config/verifyToken');
 
 const verifyPasswordToken = async (req, res, next) => {
-    let {name, email, password, formType} = req.body
+    let {password, formType} = req.body
 
     if(!password){
         req.flash("error", "Select password");
-        req.flash("name", name);
-        req.flash("email", email);
 
         if(formType == "signup"){
             return res.redirect('/signup')
