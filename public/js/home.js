@@ -82,6 +82,7 @@ form.addEventListener("submit", function (event) {
         })
       : (inputObj = {
           name: document.getElementById("name").value,
+          number: document.getElementById("number").value,
           email: document.getElementById("email").value,
           password: passArray,
         });

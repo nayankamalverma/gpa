@@ -28,7 +28,7 @@ const verifyPasswordToken = async (req, res, next) => {
         let decodedBucketToken = verifyToken(bucketToken, process.env.BUCKET_SECRET_KEY)
 
         if(!decodedImageToken || !decodedBucketToken){
-            req.send("Invalid token, either image token or bucket token");
+            return res.send("Invalid token, either image token or bucket token");
         }
         
         passArray[i] = `${decodedImageToken.key}:_:${decodedBucketToken.key}`

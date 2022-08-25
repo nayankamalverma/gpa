@@ -3,14 +3,18 @@ const express = require('express');
 const router = express.Router();
 const validator = require('validator');
 const user = require('../models/user');
+const otp = require('../models/otp');
 const createToken = require('../config/createToken');
 const sendEmail = require('../config/sendEmail');
 const gridOfRandomImages = require('../config/gridOfRandomImages');
 const verifyPasswordToken = require('../middleware/verifyPasswordToken');
 const verifyToken = require('../config/verifyToken');
 const bcrypt = require('bcryptjs');
+const generateOTP = require('../config/generateOTP');
+const sendSMS = require('../config/sendSMS');
 
 router.get('/',(req,res)=>{
+
     const userCookie = req.cookies['token'];
     if(!userCookie){
         return res.redirect('login')
@@ -87,17 +91,29 @@ router.get('/resetpassword/:token', async (req, res) => {
 // Api for Signup
 router.post('/signup', verifyPasswordToken, async (req, res) => {
 
-    const {name, email, password} = req.body;
+    const {name, email, number, password} = req.body;
     // return res.send(password)
     
     let foundEmail = await user.findOne({ email: email });
+    let foundNumber = await user.findOne({ number: number });
 
     // Check if user already exists
-    if (foundEmail) {
+    if (foundEmail || foundNumber) {
         req.flash("error", "User already exist");
         req.flash("name", name);
+        req.flash("email", email);
+        req.flash("number", number);
         return res.redirect('/signup')
     } 
+
+    //  Here we validate the user mobile number 
+    if (!validator.isMobilePhone(number)) {
+        req.flash("error", "Enter valid mobile number");
+        req.flash("name", name);
+        req.flash("email", email);
+        req.flash("number", number);
+        return res.redirect('/signup')
+    }
     //  Here we validate the user email 
     if (!validator.isEmail(email) || !name) {
         req.flash("error", "Invalid Credentials");
@@ -112,15 +128,29 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
         req.flash("email", email);
         return res.redirect('/signup')
     }
-    // return res.send(req.body)
-        const userData = new user({
-            name,
-            email,
-            password: password.toString()
-        });
-        // Store data Into Database
-        await userData.save();
-        res.redirect("/")
+    let generatedOtp = generateOTP();
+    let mobNumber = "+91" + number;
+    sendSMS(generatedOtp, mobNumber);
+
+    const userOtp = new otp({
+        number,
+        otp: generatedOtp
+    });
+    // store otp into databse
+    userOtp.save()
+    
+    const userData = new user({
+        name,
+        email,
+        number,
+        password: password.toString()
+    });
+    // Store data Into Database
+    await userData.save();
+
+    res.render("otp", {
+        expressFlash: req.flash('number', number) 
+    })
 
     
 })
@@ -152,14 +182,36 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
             req.flash("email", email);
             return res.redirect('/login')
         }
-        let userCookie = {
-            _id: foundUser._id,
-            email: foundUser.email
-        }
-        let userToken = createToken(userCookie, process.env.USER_COOKIE_SECRET, '24h')
-        console.log(userCookie);
-        res.cookie('token', userToken, {maxAge: 360000});
-        return res.redirect("/")
+
+        let number = foundUser.number
+        let generatedOtp = generateOTP();
+        let mobNumber = "+91" + number;
+        sendSMS(generatedOtp, mobNumber);
+    
+        const userOtp = new otp({
+            number,
+            otp: generatedOtp
+        });
+        // store otp into databse
+        userOtp.save()
+
+        res.render("otp", {
+            expressFlash: req.flash('number', number) 
+        })
+
+        // const usersCookie = req.cookies['token'];
+        // console.log(usersCookie);
+        // if(usersCookie){
+        //     return res.redirect('/')
+        // }
+        // let userCookie = {
+        //     _id: foundUser._id,
+        //     email: foundUser.email
+        // }
+        // let userToken = createToken(userCookie, process.env.USER_COOKIE_SECRET, '24h')
+        // console.log(userCookie);
+        // res.cookie('token', userToken, {maxAge: 360000});
+        // return res.redirect("/")
     })
 
 // Api for Mailing Reset link
@@ -197,7 +249,6 @@ router.post('/resetpassword/:token', verifyPasswordToken, async (req, res) => {
 
     const token = req.params['token'];
     const password = req.body.password;
-    console.log(password);
     // Check if email with that token exist
     const decoded = verifyToken(token, process.env.RESET_SECRET_KEY);
 
@@ -213,5 +264,33 @@ router.post('/resetpassword/:token', verifyPasswordToken, async (req, res) => {
     return res.redirect('/login')
 
 })
+
+router.post('/verifyotp', async (req, res) => {
+    let { number, enteredOtp } = req.body;
+
+    const foundNumber = await otp.findOne({number: number});
+    if(!foundNumber){
+        return res.send("Mobile number not found")
+    }
+    if(!(foundNumber.otp == enteredOtp)){
+        return res.render("otp", {
+            expressFlash: req.flash('number', number), 
+            expressFlash: req.flash('error', "incorrect otp") 
+        })
+
+    }
+    
+    foundUser = await user.findOneAndUpdate({number},{isVerified: true})
+    let userCookie = {
+        _id: foundUser._id,
+        email: foundUser.email
+    }
+    let userToken = createToken(userCookie, process.env.USER_COOKIE_SECRET, '24h')
+    res.cookie('token', userToken, {maxAge: 360000});
+    res.redirect('/')
+
+
+})
+
 
 module.exports = router;

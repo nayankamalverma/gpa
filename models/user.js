@@ -10,7 +10,12 @@ const userSchema = new Schema({
         required: true,
         minlength:3,
         maxlength:30
-       
+    },
+    number: {
+        type: String,
+        required: true,
+        unique: true
+
     },
     email: {
         type: String,
@@ -23,6 +28,10 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 })
 
