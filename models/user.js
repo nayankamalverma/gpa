@@ -32,6 +32,10 @@ const userSchema = new Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    attempt: {
+        type: Number,
+        default: 0
     }
 })
 

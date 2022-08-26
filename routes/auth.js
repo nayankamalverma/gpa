@@ -130,7 +130,7 @@ router.post('/signup', verifyPasswordToken, async (req, res) => {
     }
     let generatedOtp = generateOTP();
     let mobNumber = "+91" + number;
-    sendSMS(generatedOtp, mobNumber);
+    sendSMS(`your otp is ${generatedOtp}`, mobNumber);
 
     const userOtp = new otp({
         number,
@@ -176,8 +176,20 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
             return res.redirect('/login')
         }
 
+        if(foundUser.attempt >= 3){
+            const payload = {
+                email : foundUser.email,
+                id: foundUser._id
+            }
+            console.log(foundUser.number);
+            let token = createToken(payload, process.env.RESET_SECRET_KEY, '600s');
+            token = 'http://localhost:3000/resetpassword/'+ token
+            let mobNumber = "+91" + foundUser.number;
+            sendSMS(`Multiple login failure detected on your account if it's not you password reset link is ${token}`, mobNumber);
+        }
         const isMatch = await bcrypt.compare(password.toString(), foundUser.password)
         if(!isMatch){
+            await user.findOneAndUpdate({ email: email }, {attempt: foundUser.attempt + 1})
             req.flash("error", "Incorrect password!")
             req.flash("email", email);
             return res.redirect('/login')
@@ -186,7 +198,7 @@ router.post('/login', verifyPasswordToken, async (req, res) => {
         let number = foundUser.number
         let generatedOtp = generateOTP();
         let mobNumber = "+91" + number;
-        sendSMS(generatedOtp, mobNumber);
+        sendSMS(`your otp is ${generatedOtp}`, mobNumber);
     
         const userOtp = new otp({
             number,
@@ -230,9 +242,12 @@ router.post('/sendresetlink', async (req, res) => {
         email : foundUser.email,
         id: foundUser._id
     }
-    const token = createToken(payload, process.env.RESET_SECRET_KEY, '600s');
-    const emailResponse = await sendEmail(foundUser.email, token);
-    console.log(emailResponse);
+    console.log(foundUser.number);
+    let token = createToken(payload, process.env.RESET_SECRET_KEY, '600s');
+    token = 'http://localhost:3000/resetpassword/'+ token
+    let mobNumber = "+91" + foundUser.number;
+    sendSMS(`Your reset link is ${token}`, mobNumber);
+    // sendSMS(`your ... https://web.whatsapp.com/`, mobNumber);
     
     // if(!emailResponse){
     //     return res.send("unable to send email, please try again after sometime!")
@@ -285,6 +300,7 @@ router.post('/verifyotp', async (req, res) => {
         _id: foundUser._id,
         email: foundUser.email
     }
+    await user.findOneAndUpdate({number}, {attempt: 0})
     let userToken = createToken(userCookie, process.env.USER_COOKIE_SECRET, '24h')
     res.cookie('token', userToken, {maxAge: 360000});
     res.redirect('/')

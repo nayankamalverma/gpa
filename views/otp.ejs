@@ -15,12 +15,15 @@
 </head>
 
 <body>
+    <div class="card1 container w-50">
+        <p>Enter the 4-digit password sent in your mobile number.</p>
     <small style="color:red"><%= messages.error %> </small>
-    <form action="/verifyotp" method="post">
-        <input type="number" name="enteredOtp">
-        <input type="hidden" name="number" value="<%= messages.number %>">
-        <input type="submit">
+    <form action="/verifyotp" method="post" class="digit-group ">
+        <input type="number" name="enteredOtp" class="inp">
+        <input type="hidden" name="number" value="<%= messages.number %>" class="inp">
+        <input type="submit" class="resend">
     </form>
+</div>
     <!-- Optional JavaScript; choose one of the two! -->
 
     <!-- Option 1: Bootstrap Bundle with Popper -->

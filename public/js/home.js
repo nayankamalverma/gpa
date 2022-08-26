@@ -101,3 +101,47 @@ function onVisibility() {
     item.classList.toggle("hide-image-border");
   });
 }
+
+//Guide Tour
+
+const intro = introJs();
+intro.setOptions({
+  steps:[
+    {
+      intro: 'Welcome!!',
+    },
+    {
+      element: '#name',
+      intro: 'Enter Your Name here!'
+    },
+    {
+      element: '#number',
+      intro: 'Enter Your Mobile Number here!'
+    },
+    {
+      element: '#email',
+      intro: 'Enter Your Email address here!'
+    },
+    {
+      element: '.radio-toolbar',
+      intro: 'Select Images to assign it a Bucket as per your requirement. ' +
+          '(Default :no Bucket)'
+    },
+    {
+      element: '#pass',
+      intro: 'Select images in Sequence.'
+    },
+
+    {
+      element: '.visiblock',
+      intro: 'Preview Selected Images.'
+    },
+
+
+    {
+      element: '.btn ',
+      intro: 'Click here to Submit your Credential!'
+    },
+  ]
+})
+intro.start();
